@@ -1,0 +1,8 @@
+<svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="p2Title">
+  <title id="p2Title">Project two thumbnail placeholder</title>
+  <rect width="480" height="300" fill="#FBEDEA"/>
+  <circle cx="120" cy="150" r="70" fill="#C98B73"/>
+  <circle cx="240" cy="150" r="70" fill="#8FAE79" opacity="0.85"/>
+  <circle cx="360" cy="150" r="70" fill="#5A3A2E" opacity="0.75"/>
+  <rect x="32" y="248" width="416" height="14" rx="4" fill="#5A3A2E" opacity="0.4"/>
+</svg>

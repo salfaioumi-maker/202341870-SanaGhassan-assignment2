@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sana Ghassan Alfaioumi — Portfolio</title>
+<meta name="description" content="Professional portfolio of Sana Ghassan Alfaioumi, Data Science and Engineering student at KFUPM.">
+
+<!--here we used google fonts and IBM's-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!--This invisible link allows keyboard users and screen
+readers to bypass the navigation menu and jump directly
+to the main content of the page.-->
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+<nav class="nav" aria-label="Primary">
+<a href="#top" class="nav__brand">Sana Alfaioumi</a>
+<ul class="nav__links">
+<li><a href="#about">About</a></li>
+<li><a href="#projects">Projects</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+<button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
+<span class="theme-toggle__icon" aria-hidden="true">☾</span>
+<span class="theme-toggle__label">Dark mode</span>
+</button>
+</nav>
+</header>
+
+<main id="main">
+
+<!-- Adding About me section here -->
+<section id="top" class="hero">
+<div class="hero__text">
+<p id="greeting" class="hero__greeting">Hello</p>
+<h1 class="hero__name">Sana Ghassan Alfaioumi</h1>
+<p class="hero__tagline">Data Science &amp; Engineering student focused on analytics strategy, business solutions, and visual design.</p>
+</div>
+<img class="hero__portrait" src="assets/images/profile.svg" alt="Portrait of Sana Ghassan Alfaioumi" width="400" height="400">
+</section>
+
+<section id="about" class="about">
+<h2 class="section-heading">Professional Overview</h2>
+<p class="about__text">
+I am an undergraduate junior majoring in Data Science and Engineering at King Fahd University of Petroleum and Minerals (KFUPM). My technical focus centers on business analytics, data strategy, and translating raw metrics into actionable intelligence. Beyond data, I am also a passionate artist, frequently applying artistic principles and visual design to digital branding and physical marketing materials. I am proficient in Python and R for machine learning, seamlessly blending analytical rigor with creative problem-solving.
+</p>
+<ul class="about__skills">
+<li>Python &amp; R</li>
+<li>Machine Learning</li>
+<li>Business Analytics</li>
+<li>Visual Design</li>
+</ul>
+</section>
+
+
+<!-- Adding the projects and linking them with photos -->
+<section id="projects" class="projects">
+<h2 class="section-heading">Selected Projects</h2>
+<div class="projects__grid">
+
+<article class="project-card">
+<img class="project-card__image" src="assets/images/project-1.svg" alt="Thumbnail for the WiperIQ project" width="480" height="300" loading="lazy">
+<div class="project-card__body">
+<h3 class="project-card__title">WiperIQ Predictive Model</h3>
+<p class="project-card__desc">
+Engineered a machine learning predictive model and interactive Streamlit dashboard for the KFUPM SparkOn challenge to analyze complex drilling datasets and extract operational insights.
+</p>
+<div class="project-card__links">
+<a href="#" class="project-card__link">Live demo</a>
+<a href="#" class="project-card__link">Source code</a>
+</div>
+</div>
+</article>
+
+<article class="project-card">
+<img class="project-card__image" src="assets/images/project-2.svg" alt="Thumbnail for the stc tv analysis project" width="480" height="300" loading="lazy">
+<div class="project-card__body">
+<h3 class="project-card__title">stc tv Data Analysis</h3>
+<p class="project-card__desc">
+Conducted a comprehensive analysis of viewer categorization and streaming quality metrics using Python, translating raw platform data into strategic business intelligence.
+</p>
+<div class="project-card__links">
+<a href="#" class="project-card__link">Live demo</a>
+<a href="#" class="project-card__link">Source code</a>
+</div>
+</div>
+</article>
+
+<article class="project-card">
+<img class="project-card__image" src="assets/images/project-1.svg" alt="Thumbnail for the KAUST Academy project" width="480" height="300" loading="lazy">
+<div class="project-card__body">
+<h3 class="project-card__title">KAUST Academy Advanced Program</h3>
+<p class="project-card__desc">
+Completed rigorous advanced training modules through King Abdullah University of Science and Technology (KAUST), focusing on analytical methodologies and hands-on technical problem-solving.
+</p>
+<div class="project-card__links">
+<a href="#" class="project-card__link">More info</a>
+</div>
+</div>
+</article>
+
+</div>
+</section>
+
+<!-- Addition of Contact information and input box-->
+<section id="contact" class="contact">
+<h2 class="section-heading">Contact</h2>
+<p class="contact__intro">For professional inquiries or project collaborations, please leave a message below.</p>
+
+<form id="contactForm" class="contact-form" novalidate>
+<div class="form-field">
+<label for="name">Name</label>
+<input type="text" id="name" name="name" required minlength="2" autocomplete="name">
+</div>
+
+<div class="form-field">
+<label for="email">Email</label>
+<input type="email" id="email" name="email" required autocomplete="email">
+</div>
+
+<div class="form-field">
+<label for="message">Message</label>
+<textarea id="message" name="message" rows="5" required minlength="10"></textarea>
+</div>
+
+<button type="submit" class="btn-primary">Send message</button>
+<p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+</form>
+</section>
+</main>
+
+<footer class="site-footer">
+<p>&copy; <span id="year"></span> Sana Ghassan Alfaioumi.</p>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
