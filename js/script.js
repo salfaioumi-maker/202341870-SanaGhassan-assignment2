@@ -183,7 +183,7 @@ function initArtwork() {
   if (!loadingEl || !contentEl) return;
 
   const API_URL = 'https://api.artic.edu/api/v1/artworks';
-  const FIELDS = 'id,title,artist_display,date_display,image_id';
+  const FIELDS = 'id,title,artist_display,date_display,image_id,is_public_domain';
 
   // Show only one of the three states: "loading", "error", or "artwork"
   function showState(state) {
@@ -209,10 +209,10 @@ function initArtwork() {
 
       const result = await response.json();
 
-      // Some artworks have no picture, so keep only the ones that have an image
-      const withImages = result.data.filter((art) => art.image_id);
+      // Keep only public-domain artworks that have a picture
+      const withImages = result.data.filter((art) => art.image_id && art.is_public_domain);
       if (withImages.length === 0) {
-        throw new Error('No artworks with images on this page');
+        throw new Error('No public-domain artworks with images on this page');
       }
 
       // Choose one of them at random
@@ -223,13 +223,13 @@ function initArtwork() {
 
       // Build the image link using the museum's image server (IIIF)
       const iiifUrl = result.config?.iiif_url || 'https://www.artic.edu/iiif/2';
-      imageEl.src = `${iiifUrl}/${art.image_id}/full/843,/0/default.jpg`;
-      imageEl.alt = `${art.title} by ${artist}`;
-
       titleEl.textContent = art.title || 'Untitled';
       artistEl.textContent = [artist, art.date_display].filter(Boolean).join(' · ');
+      imageEl.alt = `${art.title} by ${artist}`;
 
-      showState('artwork');
+      // Keep the spinner until the picture has fully downloaded, then show everything together
+      imageEl.onload = () => showState('artwork');
+      imageEl.src = `${iiifUrl}/${art.image_id}/full/843,/0/default.jpg`;
     } catch (error) {
       // Log the technical details for developers, and show a friendly message to the user
       console.error('Could not load artwork:', error);
@@ -248,4 +248,3 @@ function initArtwork() {
   // Load the first artwork when the page opens
   loadArtwork();
 }
-
