@@ -26,6 +26,7 @@ to the main content of the page.-->
 <ul class="nav__links">
 <li><a href="#about">About</a></li>
 <li><a href="#projects">Projects</a></li>
+<li><a href="#inspiration">Inspiration</a></li>
 <li><a href="#contact">Contact</a></li>
 </ul>
 <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
@@ -126,6 +127,36 @@ Completed rigorous advanced training modules through King Abdullah University of
 <p id="noResults" class="no-results" hidden>
 No projects match your search. Try a different keyword or click “All”.
 </p>
+</section>
+
+<!-- Daily inspiration: a random artwork loaded from the Art Institute of Chicago public API -->
+<section id="inspiration" class="inspiration">
+<h2 class="section-heading">Daily Inspiration</h2>
+<p class="inspiration__intro">As an artist, I love finding new pieces. Here is a random public-domain artwork from the Art Institute of Chicago.</p>
+
+<div id="artCard" class="art-card" aria-live="polite">
+<!-- Shown while the artwork is loading -->
+<p id="artLoading" class="art-status">
+<span class="spinner" aria-hidden="true"></span> Loading artwork…
+</p>
+
+<!-- Shown if the request fails -->
+<div id="artError" class="art-status art-status--error" hidden>
+<p>Sorry, the artwork couldn't load. Please check your internet connection and try again.</p>
+<button type="button" id="artRetry" class="btn-secondary">Try again</button>
+</div>
+
+<!-- The artwork itself, filled in by JavaScript -->
+<figure id="artContent" class="art-content" hidden>
+<img id="artImage" class="art-content__image" alt="" width="843" height="600">
+<figcaption>
+<h3 id="artTitle" class="art-content__title"></h3>
+<p id="artArtist" class="art-content__artist"></p>
+</figcaption>
+</figure>
+</div>
+
+<button type="button" id="artNext" class="btn-primary">Show another artwork</button>
 </section>
 
 <!-- Addition of Contact information and input box-->
