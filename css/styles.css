@@ -492,6 +492,11 @@ main > section {
 
 
 /* ---------- Project filter + search ---------- */
+
+/*
+  The row that holds the search box and the filter buttons.
+  "flex-wrap" lets the buttons drop under the search box on small phone screens.
+*/
 .project-controls {
   display: flex;
   flex-wrap: wrap;
@@ -500,19 +505,36 @@ main > section {
   margin-bottom: var(--space-2);
 }
 
+/*
+  The search box. It grows to fill the free space but never gets narrower than 220px.
+  The small magnifying-glass icon is drawn with an inline SVG background image,
+  and the extra left padding stops the text from sitting on top of the icon.
+*/
 .project-search {
   flex: 1 1 220px;
-  padding: 0.6rem 0.9rem;
+  padding: 0.6rem 0.9rem 0.6rem 2.4rem;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
+  border-radius: 999px;
+  background: var(--color-surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2387a273' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='m11 11 3.5 3.5'/%3E%3C/svg%3E") no-repeat 0.9rem center;
   color: var(--color-ink);
   font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.project-search::placeholder {
+  color: var(--color-ink-soft);
+  opacity: 0.7;
+}
+
+.project-search:hover {
+  border-color: var(--color-teal);
+}
+
+/* A soft green glow when the user clicks into the search box */
 .project-search:focus {
-  outline: 2px solid var(--color-teal);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--color-teal);
+  box-shadow: 0 0 0 3px rgba(135, 162, 115, 0.25);
 }
 
 .filter-buttons {
@@ -521,40 +543,52 @@ main > section {
   gap: var(--space-1);
 }
 
+/* Pill-shaped filter buttons */
 .filter-btn {
-  padding: 0.45rem 0.9rem;
+  padding: 0.45rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
   background: transparent;
   color: var(--color-ink-soft);
   font: inherit;
   font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.filter-btn:hover { transform: translateY(-2px); border-color: var(--color-teal); }
+/* Lift slightly and turn the border green on hover */
+.filter-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-teal);
+  color: var(--color-ink);
+}
 
+/* Press down slightly when clicked, so the button feels physical */
+.filter-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* The selected button uses the pink accent colour from my palette */
 .filter-btn.is-active {
-  background: var(--color-ink);
-  color: var(--color-bg);
-  border-color: var(--color-ink);
+  background: var(--color-gold);
+  color: #FFFFFF;
+  border-color: var(--color-gold);
 }
 
+/* "Showing 2 of 3 projects" text */
 .project-count {
   font-size: 0.85rem;
+  color: var(--color-ink-soft);
   margin: 0 0 var(--space-2);
 }
 
-/* Cards fade + shrink out when hidden, fade back in when shown */
-.project-card {
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
+/* Hidden cards are removed from the grid so the other cards close the gap */
 .project-card.is-hidden {
   display: none;
 }
 
+/* Cards that come back after filtering fade and slide up into place */
 .project-card.is-entering {
   animation: cardIn 0.35s ease both;
 }
@@ -564,19 +598,30 @@ main > section {
   to   { opacity: 1; transform: none; }
 }
 
+/* The "No projects found" message, shown in a dashed box */
 .no-results {
   text-align: center;
   padding: var(--space-3);
-  border: 1px dashed var(--color-border);
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-teal);
   border-radius: var(--radius);
   animation: cardIn 0.35s ease both;
 }
 
+/*
+  Accessibility: hides the "Search projects" label from the screen
+  but keeps it readable for screen readers.
+*/
 .visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
   overflow: hidden;
   clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
 }
