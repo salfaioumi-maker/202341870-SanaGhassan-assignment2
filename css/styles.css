@@ -576,6 +576,11 @@ main > section {
   border-color: var(--color-gold);
 }
 
+/* In dark mode, use dark text on the selected button so it stays easy to read */
+[data-theme="dark"] .filter-btn.is-active {
+  color: #2E211D;
+}
+
 /* "Showing 2 of 3 projects" text */
 .project-count {
   font-size: 0.85rem;
