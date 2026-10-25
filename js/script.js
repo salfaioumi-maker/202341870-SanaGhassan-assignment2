@@ -248,3 +248,4 @@ function initArtwork() {
   // Load the first artwork when the page opens
   loadArtwork();
 }
+
