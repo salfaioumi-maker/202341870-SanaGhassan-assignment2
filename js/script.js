@@ -198,9 +198,9 @@ function initArtwork() {
     showState('loading');
 
     try {
-      // Pick a random page of 10 artworks, so each click shows something new
+      // Pick a random page of 50 artworks, so each click shows something new
       const page = Math.floor(Math.random() * 100) + 1;
-      const response = await fetch(`${API_URL}?page=${page}&limit=10&fields=${FIELDS}`);
+      const response = await fetch(`${API_URL}?page=${page}&limit=50&fields=${FIELDS}`);
 
       // fetch() does not fail on errors like 404 or 500, so we check it ourselves
       if (!response.ok) {
