@@ -572,7 +572,7 @@ main > section {
 /* The selected button uses the pink accent colour from my palette */
 .filter-btn.is-active {
   background: var(--color-gold);
-  color: #FFFFFF;
+  color: #2E211D;
   border-color: var(--color-gold);
 }
 
@@ -629,4 +629,115 @@ main > section {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;
+}
+/* ---------- Daily inspiration (artwork from a public API) ---------- */
+
+.inspiration__intro {
+  margin: 0 0 var(--space-3);
+  max-width: 60ch;
+}
+
+/*
+  The card that holds the loading message, the error message, or the artwork.
+  "min-height" keeps the card the same size while loading, so the page doesn't jump.
+*/
+.art-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-2);
+}
+
+/*
+  Make sure anything with the "hidden" attribute really disappears,
+  even if another rule below gives it display: flex.
+*/
+.art-card [hidden] {
+  display: none;
+}
+
+/* Loading and error messages */
+.art-status {
+  margin: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.art-status--error {
+  color: #C9503B;
+  animation: cardIn 0.35s ease both;
+}
+
+.art-status--error p { margin: 0; }
+
+/* A small spinning circle shown while loading */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-teal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* The artwork image and its caption */
+.art-content {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  animation: cardIn 0.45s ease both;
+}
+
+.art-content__image {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  margin: 0 auto var(--space-2);
+  border-radius: 6px;
+}
+
+.art-content__title {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.art-content__artist {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Outline-style button used for "Try again" */
+.btn-secondary {
+  background: transparent;
+  color: var(--color-ink);
+  border: 1px solid var(--color-ink);
+  border-radius: 999px;
+  padding: 0.5rem 1.2rem;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+
+/* Greyed-out look for the button while an artwork is loading */
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
