@@ -170,7 +170,7 @@ function initProjectFilter() {
 
 
 
-// Load a random artwork from the Art Institute of Chicago public API
+// Load a random public-domain painting from The Metropolitan Museum of Art (The Met) public API
 function initArtwork() {
   const loadingEl = document.getElementById('artLoading');
   const errorEl = document.getElementById('artError');
@@ -180,10 +180,15 @@ function initArtwork() {
   const artistEl = document.getElementById('artArtist');
   const nextBtn = document.getElementById('artNext');
   const retryBtn = document.getElementById('artRetry');
-  if (!loadingEl || !contentEl) return;
+  if (!loadingEl || !errorEl || !contentEl) return;
 
-  const API_URL = 'https://api.artic.edu/api/v1/artworks';
-  const FIELDS = 'id,title,artist_display,date_display,image_id,is_public_domain';
+  // Step 1 asks for a list of painting IDs, step 2 asks for the details of one ID
+  const SEARCH_URL = 'https://collectionapi.metmuseum.org/public/collection/v1/search?departmentId=11&hasImages=true&q=painting';
+  const OBJECT_URL = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/';
+  const MAX_TRIES = 5;
+
+  // The list of IDs is saved after the first request, so it is only downloaded once
+  let artworkIds = [];
 
   // Show only one of the three states: "loading", "error", or "artwork"
   function showState(state) {
@@ -194,42 +199,56 @@ function initArtwork() {
     nextBtn.disabled = state === 'loading';
   }
 
+  // Get the list of painting IDs (only the first time)
+  async function getArtworkIds() {
+    if (artworkIds.length > 0) return artworkIds;
+
+    const response = await fetch(SEARCH_URL);
+    if (!response.ok) {
+      throw new Error(`Search request failed with status ${response.status}`);
+    }
+    const result = await response.json();
+    artworkIds = result.objectIDs || [];
+
+    if (artworkIds.length === 0) {
+      throw new Error('The search returned no artworks');
+    }
+    return artworkIds;
+  }
+
   async function loadArtwork() {
     showState('loading');
 
     try {
-      // Pick a random page of 50 artworks, so each click shows something new
-      const page = Math.floor(Math.random() * 100) + 1;
-      const response = await fetch(`${API_URL}?page=${page}&limit=50&fields=${FIELDS}`);
+      const ids = await getArtworkIds();
 
-      // fetch() does not fail on errors like 404 or 500, so we check it ourselves
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+      // Some IDs have no public-domain image, so try a few random ones until one works
+      let art = null;
+      for (let attempt = 0; attempt < MAX_TRIES && !art; attempt++) {
+        const id = ids[Math.floor(Math.random() * ids.length)];
+        const response = await fetch(OBJECT_URL + id);
+        if (!response.ok) continue; // skip this ID and try another one
+
+        const data = await response.json();
+        if (data.isPublicDomain && data.primaryImageSmall) {
+          art = data;
+        }
       }
 
-      const result = await response.json();
-
-      // Keep only public-domain artworks that have a picture
-      const withImages = result.data.filter((art) => art.image_id && art.is_public_domain);
-      if (withImages.length === 0) {
-        throw new Error('No public-domain artworks with images on this page');
+      if (!art) {
+        throw new Error(`No public-domain artwork with an image after ${MAX_TRIES} tries`);
       }
 
-      // Choose one of them at random
-      const art = withImages[Math.floor(Math.random() * withImages.length)];
+      const title = art.title || 'Untitled';
+      const artist = art.artistDisplayName || 'Unknown artist';
 
-      // The museum puts line breaks inside artist names, so turn them into commas
-      const artist = (art.artist_display || 'Unknown artist').replace(/\n/g, ', ');
-
-      // Build the image link using the museum's image server (IIIF)
-      const iiifUrl = result.config?.iiif_url || 'https://www.artic.edu/iiif/2';
-      titleEl.textContent = art.title || 'Untitled';
-      artistEl.textContent = [artist, art.date_display].filter(Boolean).join(' · ');
-      imageEl.alt = `${art.title} by ${artist}`;
+      titleEl.textContent = title;
+      artistEl.textContent = [artist, art.objectDate].filter(Boolean).join(' · ');
+      imageEl.alt = `${title} by ${artist}`;
 
       // Keep the spinner until the picture has fully downloaded, then show everything together
       imageEl.onload = () => showState('artwork');
-      imageEl.src = `${iiifUrl}/${art.image_id}/full/843,/0/default.jpg`;
+      imageEl.src = art.primaryImageSmall;
     } catch (error) {
       // Log the technical details for developers, and show a friendly message to the user
       console.error('Could not load artwork:', error);
