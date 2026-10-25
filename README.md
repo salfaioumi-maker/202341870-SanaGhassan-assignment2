@@ -99,7 +99,8 @@ AI tools were used during Assignment 2 to support the work:
 * **Claude (Opus 5.5):** explained the assignment requirements, suggested and generated starter code for the project filter/search and the Daily Inspiration API feature, reviewed my edits, and helped debug Git commit issues.
 * **GitHub Copilot:** generated commit messages in VS Code.
 
-The Daily Inspiration idea was my own. I reviewed, tested, and edited all AI-generated code. For example, I redesigned the search box and buttons, added the artwork date and a public-domain filter, and fixed a bug where hidden status messages could still appear. Full details, including the usage log and declaration, are documented in docs/ai-usage-report.md
+The Daily Inspiration idea was my own. I reviewed, tested, and edited all AI-generated code. For example, I redesigned the search box and buttons, added the artwork date and a public-domain filter, and fixed a bug where hidden status messages could still appear. Full details, including the usage log and declaration, are documented in docs/ai-usage-report.md 
+
 
 ## 📁 Project Structure
 
