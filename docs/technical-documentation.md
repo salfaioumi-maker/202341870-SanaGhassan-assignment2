@@ -1,150 +1,113 @@
+
 # Technical Documentation
 
 **Author:** Sana Ghassan Alfaioumi (202341870)
-**Project:** Portfolio Website (Assignment 1)
+**Project:** Portfolio Website (Assignment 2)
 
 ---
 
 ## 1. Structure (HTML5)
 
-- Written with semantic tags (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<footer>`) instead of generic divisions.
+- Written with semantic tags (`<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<figure>`, `<footer>`) instead of generic divisions.
 - Includes a hidden "skip link" at the top so keyboard and screen-reader users can jump straight to the content without tabbing through the navigation every time.
 - Forms use native validation attributes (`required`, `minlength`, `type="email"`) to ensure clean input before submission.
+- **New in Assignment 2:**
+  - Each project card has a `data-category` attribute (`ml`, `analysis`, `training`) that the filter buttons use to match cards.
+  - The search box has a visually hidden `<label>` so screen readers can announce it, and the filter buttons use `aria-pressed` to show which one is selected.
+  - The project counter and the artwork card use `aria-live="polite"`, so screen readers announce changes ("Showing 1 of 3 projects", loading, error) without the user having to look for them.
+  - The Daily Inspiration card contains three states in the HTML (loading, error, artwork); all but one start with the `hidden` attribute and JavaScript switches between them.
 
 ---
 
 ## 2. Design & Styling (CSS3)
 
-- **Design System:** Colors and fonts are organized using CSS variables at the top of the stylesheet for easy theme switching.
+- **Design System:** Colors and fonts are organized using CSS variables at the top of the stylesheet for easy theme switching. All new components use the same variables, so they automatically work in dark mode.
 - **Layout:** Built entirely with CSS Grid and Flexbox—no external CSS libraries or frameworks were used.
-- **Responsive:** Fluid typography (`clamp`) and media queries allow the layout to adapt smoothly from mobile screens up to desktop monitors.
-- **Motion Preferences:** Includes a `@media (prefers-reduced-motion)` check to turn off smooth scrolling for users who prefer minimal animation.
+- **Responsive:** Fluid typography (`clamp`) and media queries allow the layout to adapt smoothly from mobile screens up to desktop monitors. The filter controls use `flex-wrap` so the buttons drop under the search box on small screens.
+- **Motion Preferences:** Includes a `@media (prefers-reduced-motion)` check to turn off smooth scrolling and animations for users who prefer minimal animation.
+- **New in Assignment 2 – Animations & Transitions:**
+  - `@keyframes cardIn` fades and slides elements up into place. It is reused for project cards that reappear after filtering, the "No projects match" box, the error message, and the loaded artwork.
+  - `@keyframes spin` rotates the loading spinner.
+  - Filter buttons use `transition` + `transform` to lift on hover and press down on click (`:active`).
+  - The search box shows a soft green glow on focus using `box-shadow` instead of a hard outline.
+- **Hidden states:** `.art-card [hidden] { display: none; }` makes sure elements with the `hidden` attribute really disappear, even though `.art-status` sets `display: flex` (which would otherwise override `hidden`).
+- **Accessibility contrast:** The selected filter button uses white text on the pink accent in light mode and dark text in dark mode, so it stays readable in both.
 
 ---
 
 ## 3. Interactive Features (JavaScript)
 
+All features start from one `DOMContentLoaded` listener, which calls a separate `init…` function for each feature. Each function first checks that its main HTML elements exist, so one missing element never breaks the rest of the page.
+
+### From Assignment 1
+
 - **Theme Toggle:** Switches between light and dark mode, checks what the user's computer prefers by default, and remembers the choice using `localStorage`.
 - **Time-Based Greeting:** Reads the visitor's local hour to say "Good morning," "Good afternoon," or "Good evening" dynamically.
-- **Contact Form Demo:** Uses `e.preventDefault()` so the page doesn't refresh on submit, checks that the fields are valid, and displays an immediate friendly thank-you note.
+- **Contact Form Demo:** Uses `event.preventDefault()` so the page doesn't refresh on submit, checks that the fields are valid, and displays an immediate friendly thank-you note.
 - **Footer Year:** Updates the copyright year dynamically with `new Date().getFullYear()`.
 
 ### New in Assignment 2
 
-#### a) Project Filter & Live Search — `initProjectFilter()`
+#### 3.1 Project Filter & Live Search — `initProjectFilter()`
 
-The filter combines two conditions: the selected category button **and** the search text. A card is shown only if it matches both.
+| Step | What happens                                                                                                                                                                        |
+| ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | `activeFilter` stores the selected category (`"all"` at first).                                                                                                                 |
+| 2    | Clicking a button updates `activeFilter`, moves the `is-active` class and `aria-pressed`, then calls `updateProjects()`.                                                    |
+| 3    | Typing in the search box fires the `input` event, which also calls `updateProjects()`.                                                                                          |
+| 4    | `updateProjects()` checks every card: it is shown only if it matches the category **and** its text contains the search query (case-insensitive).                            |
+| 5    | Hidden cards get the `is-hidden` class; cards that come back get `is-entering`, which plays the fade-in. `void card.offsetWidth` forces the browser to restart the animation. |
+| 6    | The counter text is updated, and the "No projects match" message is shown when 0 cards are visible.                                                                                 |
 
-```
-User clicks a button  ──┐
-                        ├──►  updateProjects()
-User types in search  ──┘          │
-                                   ▼
-              For each project card:
-              matches category?  AND  text contains search?
-                    │                        │
-                  yes ──► show card (fade-in animation)
-                  no  ──► hide card (class "is-hidden")
-                                   │
-                                   ▼
-              Update counter: "Showing X of 3 projects"
-              If X = 0 → show "No projects match your search"
-```
+#### 3.2 Daily Inspiration (Public API) — `initArtwork()`
 
-- The search uses the `input` event, so results update on every keystroke.
-- The search is case-insensitive (`toLowerCase()`) and checks all the text inside each card (title and description).
-- To replay the fade-in animation, the code removes the animation class, forces the browser to recalculate the layout (`void card.offsetWidth`), and adds the class again.
-
-#### b) Daily Inspiration (Public API) — `initArtwork()`
-
-Loads a random artwork from the **Art Institute of Chicago API** (`https://api.artic.edu/api/v1/artworks`). No API key is needed.
+**API:** [Art Institute of Chicago API](https://api.artic.edu/docs/) — free, no API key required.
 
 ```
-Page loads / "Show another artwork" / "Try again"
-                     │
-                     ▼
-        showState('loading')  →  spinner + "Loading artwork…", button disabled
-                     │
-                     ▼
-     fetch() a random page of 10 artworks (pages 1–100)
-                     │
-         ┌───────────┴────────────┐
-      success                   failure (offline, server error, no usable artwork)
-         │                          │
-         ▼                          ▼
- keep only artworks that      showState('error')
- are public domain AND        → friendly message + "Try again" button
- have an image                (technical details go to console.error)
-         │
-         ▼
- pick one at random, fill in title + artist + date,
- build image URL with the museum's IIIF image server
-         │
-         ▼
- wait for the image to finish downloading (img.onload)
-         │
-         ▼
- showState('artwork')  →  image + caption fade in together
+showState('loading')            → spinner visible, "Show another" disabled
+        │
+fetch(random page, 10 artworks, only needed fields)
+        │
+response.ok? ── no ──► throw error ─┐
+        │ yes                       │
+keep artworks with image_id         │
+AND is_public_domain                │
+        │                           │
+none left? ── yes ──► throw error ──┤
+        │ no                        │
+pick one at random                  │
+fill title, artist + date, alt text │
+set image src (IIIF image server)   │
+        │                           ▼
+image onload → showState('artwork') catch → showState('error')
+image error  → showState('error')        (console.error logs details)
 ```
 
-- **Request:** `fetch()` with `async/await` and a `fields` parameter, so the API only returns the data the page needs (`id, title, artist_display, date_display, image_id, is_public_domain`). This keeps the response small and fast.
-- **Image URL:** Built from the API's `iiif_url` and the artwork's `image_id`, e.g. `https://www.artic.edu/iiif/2/{image_id}/full/843,/0/default.jpg`. The width 843px is the size the museum recommends.
-- **States:** A single `showState()` function controls which of the three states is visible, so the user always sees exactly one clear message.
-- **Clean text:** The museum's artist names contain line breaks, which are replaced with commas.
+- **`showState(state)`** keeps exactly one of the three states visible by toggling the `hidden` property, and disables the "Show another artwork" button while loading so it can't be clicked repeatedly.
+- **Only needed data:** the request asks for only 6 fields (`fields=id,title,artist_display,date_display,image_id,is_public_domain`) to keep the response small and fast.
+- **Image URL:** built from the API's `config.iiif_url` + the artwork's `image_id` + `/full/843,/0/default.jpg` (843px wide, the museum's recommended size). A fallback IIIF address is used if `config` is missing.
+- **Waiting for the image:** the artwork is only shown in `imageEl.onload`, so the spinner stays until the picture has downloaded and everything appears together.
+- **Safety:** text from the API is inserted with `textContent`, never `innerHTML`, so no outside content can run as code.
+- **Error handling:** `try / catch` covers network failures, non-OK responses (e.g. 404/500), and pages with no usable artworks; an image `error` listener covers broken images. In every case the user sees a friendly message and a **Try again** button.
 
 ---
 
-## 4. Error Handling & User Feedback
+## 4. User Feedback Summary
 
-| Situation                                      | What the user sees                                                                                                    |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Artwork is loading                             | Spinner + "Loading artwork…", "Show another artwork" button greyed out                                               |
-| No internet / request blocked                  | "Sorry, the artwork couldn't load. Please check your internet connection and try again." + **Try again** button |
-| Server error (e.g. 404, 500)                   | Same friendly message. `fetch()` does not treat these as errors, so the code checks `response.ok` itself          |
-| Page has no public-domain artworks with images | Same friendly message. **Try again** loads a different random page                                              |
-| Image fails to download                        | Same friendly message, through the image's `error` event                                                            |
-| Search or filter finds no projects             | "No projects match your search. Try a different keyword or click 'All'."                                              |
-| Contact form has empty or invalid fields       | "Please fill in every field before sending." in red, plus the browser's built-in field hints                          |
-| Contact form sent                              | "Thanks, [name]! …" confirmation                                                                                     |
+| Situation                   | What the user sees                                                                 |
+| --------------------------- | ---------------------------------------------------------------------------------- |
+| Artwork loading             | Spinner + "Loading artwork…", disabled "Show another" button                      |
+| Artwork failed              | Red message explaining what happened + **Try again** button                  |
+| Search/filter finds nothing | Dashed box: "No projects match your search. Try a different keyword or click All." |
+| Filter/search used          | "Showing X of 3 projects" counter                                                  |
+| Contact form invalid        | Red message + browser validation hints                                             |
+| Contact form sent           | Personalized thank-you message                                                     |
 
 ---
 
-## 5. Performance
+## 5. Performance & Compatibility
 
-- No frameworks or libraries, only plain HTML, CSS, and JavaScript, so the page loads quickly.
-- Project images use `loading="lazy"` so they load only when scrolled into view.
-- The API request asks only for the needed fields and a small page of 10 results.
-- Filtering only toggles CSS classes on existing elements and does not rebuild the page.
-- The "Show another artwork" button is disabled while loading, which prevents repeated requests from fast clicking.
-
----
-
-## 6. Browser Compatibility
-
-- Uses widely supported modern features: CSS Grid, Flexbox, CSS variables, `fetch`, `async/await`, and optional chaining (`?.`). These work in current versions of Chrome, Safari, Firefox, and Edge.
-- The layout was checked at phone, tablet, and desktop widths using browser Developer Tools.
-- The Daily Inspiration section needs an internet connection. Without one, the friendly error message is shown, and the rest of the site still works.
-
----
-
-## 7. Testing
-
-| Test                                                  | Expected result                                              |
-| ----------------------------------------------------- | ------------------------------------------------------------ |
-| Click each filter button                              | Only matching projects show; counter updates                 |
-| Type "python" in search                               | Only the stc tv project shows                                |
-| Type "zzz" in search                                  | "No projects match" message appears                          |
-| Load the page                                         | Spinner shows, then an artwork appears with title and artist |
-| Click "Show another artwork"                          | A new artwork loads                                          |
-| Turn on Offline mode in DevTools and click the button | Error message and "Try again" button appear                  |
-| Go back online and click "Try again"                  | Artwork loads again                                          |
-| Toggle dark mode                                      | All new sections switch colors correctly                     |
-| Turn on "Reduce motion" in system settings            | Animations are turned off                                    |
-
----
-
-## 8. Known Limitations
-
-- The contact form is a front-end demo only. Messages are not sent anywhere because there is no backend server.
-- The artwork comes from a random page, so sometimes a page has no public-domain artworks with images. In that case the error message appears, and "Try again" loads a different page.
-- The Daily Inspiration section depends on the Art Institute of Chicago API being online.
+- No frameworks or libraries: only one HTML, one CSS, and one JS file, plus Google Fonts.
+- Project images use `loading="lazy"`; the artwork request only asks for the fields it needs.
+- Uses standard modern browser features (`fetch`, `async/await`, `classList`, CSS Grid/Flexbox, CSS variables) supported by current Chrome, Safari, Firefox, and Edge.
+- Tested in Chrome and Safari on macOS, and with the device toolbar for mobile sizes.
