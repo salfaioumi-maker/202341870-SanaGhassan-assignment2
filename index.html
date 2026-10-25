@@ -74,4 +74,91 @@ I am an undergraduate junior majoring in Data Science and Engineering at King Fa
 <button type="button" class="filter-btn" data-filter="ml" aria-pressed="false">Machine Learning</button>
 <button type="button" class="filter-btn" data-filter="analysis" aria-pressed="false">Data Analysis</button>
 <button type="button" class="filter-btn" data-filter="training" aria-pressed="false">Training</button>
-</div
+</div>
+</div>
+
+<p id="projectCount" class="project-count" aria-live="polite"></p>
+<div class="projects__grid">
+
+<article class="project-card" data-category="ml">
+<img class="project-card__image" src="assets/images/project-1.svg" alt="Thumbnail for the WiperIQ project" width="480" height="300" loading="lazy">
+<div class="project-card__body">
+<h3 class="project-card__title">WiperIQ Predictive Model</h3>
+<p class="project-card__desc">
+Engineered a machine learning predictive model and interactive Streamlit dashboard for the KFUPM SparkOn challenge to analyze complex drilling datasets and extract operational insights.
+</p>
+<div class="project-card__links">
+<a href="#" class="project-card__link">Live demo</a>
+<a href="#" class="project-card__link">Source code</a>
+</div>
+</div>
+</article>
+
+<article class="project-card" data-category="analysis">
+<img class="project-card__image" src="assets/images/project-2.svg" alt="Thumbnail for the stc tv analysis project" width="480" height="300" loading="lazy">
+<div class="project-card__body">
+<h3 class="project-card__title">stc tv Data Analysis</h3>
+<p class="project-card__desc">
+Conducted a comprehensive analysis of viewer categorization and streaming quality metrics using Python, translating raw platform data into strategic business intelligence.
+</p>
+<div class="project-card__links">
+<a href="#" class="project-card__link">Live demo</a>
+<a href="#" class="project-card__link">Source code</a>
+</div>
+</div>
+</article>
+
+<article class="project-card" data-category="training">
+<img class="project-card__image" src="assets/images/project-1.svg" alt="Thumbnail for the KAUST Academy project" width="480" height="300" loading="lazy">
+<div class="project-card__body">
+<h3 class="project-card__title">KAUST Academy Advanced Program</h3>
+<p class="project-card__desc">
+Completed rigorous advanced training modules through King Abdullah University of Science and Technology (KAUST), focusing on analytical methodologies and hands-on technical problem-solving.
+</p>
+<div class="project-card__links">
+<a href="#" class="project-card__link">More info</a>
+</div>
+</div>
+</article>
+
+</div>
+
+<p id="noResults" class="no-results" hidden>
+No projects match your search. Try a different keyword or click “All”.
+</p>
+</section>
+
+<!-- Addition of Contact information and input box-->
+<section id="contact" class="contact">
+<h2 class="section-heading">Contact</h2>
+<p class="contact__intro">For professional inquiries or project collaborations, please leave a message below.</p>
+
+<form id="contactForm" class="contact-form" novalidate>
+<div class="form-field">
+<label for="name">Name</label>
+<input type="text" id="name" name="name" required minlength="2" autocomplete="name">
+</div>
+
+<div class="form-field">
+<label for="email">Email</label>
+<input type="email" id="email" name="email" required autocomplete="email">
+</div>
+
+<div class="form-field">
+<label for="message">Message</label>
+<textarea id="message" name="message" rows="5" required minlength="10"></textarea>
+</div>
+
+<button type="submit" class="btn-primary">Send message</button>
+<p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+</form>
+</section>
+</main>
+
+<footer class="site-footer">
+<p>&copy; <span id="year"></span> Sana Ghassan Alfaioumi.</p>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
