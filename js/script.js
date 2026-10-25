@@ -1,10 +1,10 @@
-
 // Run these setup functions as soon as the HTML page finishes loading
 document.addEventListener('DOMContentLoaded', () => {
   setFooterYear();
   setGreeting();
   initThemeToggle();
   initContactForm();
+  initProjectFilter();
 });
 
 
@@ -102,3 +102,67 @@ function initContactForm() {
   });
 }
 
+
+
+// Filter the project cards by category button AND by live search text
+function initProjectFilter() {
+  const searchInput = document.getElementById('projectSearch');
+  const buttons = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.project-card');
+  const noResults = document.getElementById('noResults');
+  const countEl = document.getElementById('projectCount');
+  if (!searchInput || cards.length === 0) return;
+
+  // Remember which button is selected ("all" when the page first loads)
+  let activeFilter = 'all';
+
+  // Check every card and decide whether to show or hide it
+  function updateProjects() {
+    const query = searchInput.value.trim().toLowerCase();
+    let visible = 0;
+
+    cards.forEach((card) => {
+      // A card is shown only if it matches the selected button AND the search text
+      const matchesCategory = activeFilter === 'all' || card.dataset.category === activeFilter;
+      const matchesSearch = card.textContent.toLowerCase().includes(query);
+      const show = matchesCategory && matchesSearch;
+
+      if (show) {
+        // If the card was hidden before, bring it back with the fade-in animation
+        if (card.classList.contains('is-hidden')) {
+          card.classList.remove('is-hidden');
+          card.classList.remove('is-entering');
+          void card.offsetWidth; // forces the browser to restart the animation
+          card.classList.add('is-entering');
+        }
+        visible++;
+      } else {
+        card.classList.add('is-hidden');
+      }
+    });
+
+    // Show the "No projects found" message only when nothing matches
+    noResults.hidden = visible !== 0;
+    countEl.textContent = `Showing ${visible} of ${cards.length} projects`;
+  }
+
+  // When a filter button is clicked, highlight it and update the cards
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      buttons.forEach((b) => {
+        b.classList.remove('is-active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-pressed', 'true');
+      activeFilter = btn.dataset.filter;
+      updateProjects();
+    });
+  });
+
+  // Update the cards live every time the user types in the search box
+  searchInput.addEventListener('input', updateProjects);
+
+  // Run once at the start so the counter shows "Showing 3 of 3 projects"
+  updateProjects();
+}
