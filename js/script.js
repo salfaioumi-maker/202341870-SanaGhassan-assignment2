@@ -143,6 +143,11 @@ function initProjectFilter() {
 
     // Show the "No projects found" message only when nothing matches
     noResults.hidden = visible !== 0;
+    if (visible === 0) {
+      noResults.textContent = query
+        ? `No projects match "${query}". Try a different keyword or click "All".`
+        : 'No projects in this category yet.';
+    }
     countEl.textContent = `Showing ${visible} of ${cards.length} projects`;
   }
 
