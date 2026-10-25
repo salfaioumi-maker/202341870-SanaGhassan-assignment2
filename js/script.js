@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
   initContactForm();
   initProjectFilter();
+  initArtwork();
 });
 
 
@@ -143,11 +144,6 @@ function initProjectFilter() {
 
     // Show the "No projects found" message only when nothing matches
     noResults.hidden = visible !== 0;
-    if (visible === 0) {
-      noResults.textContent = query
-        ? `No projects match "${query}". Try a different keyword or click "All".`
-        : 'No projects in this category yet.';
-    }
     countEl.textContent = `Showing ${visible} of ${cards.length} projects`;
   }
 
@@ -170,4 +166,85 @@ function initProjectFilter() {
 
   // Run once at the start so the counter shows "Showing 3 of 3 projects"
   updateProjects();
+}
+
+
+
+// Load a random artwork from the Art Institute of Chicago public API
+function initArtwork() {
+  const loadingEl = document.getElementById('artLoading');
+  const errorEl = document.getElementById('artError');
+  const contentEl = document.getElementById('artContent');
+  const imageEl = document.getElementById('artImage');
+  const titleEl = document.getElementById('artTitle');
+  const artistEl = document.getElementById('artArtist');
+  const nextBtn = document.getElementById('artNext');
+  const retryBtn = document.getElementById('artRetry');
+  if (!loadingEl || !contentEl) return;
+
+  const API_URL = 'https://api.artic.edu/api/v1/artworks';
+  const FIELDS = 'id,title,artist_display,date_display,image_id';
+
+  // Show only one of the three states: "loading", "error", or "artwork"
+  function showState(state) {
+    loadingEl.hidden = state !== 'loading';
+    errorEl.hidden = state !== 'error';
+    contentEl.hidden = state !== 'artwork';
+    // Disable the button while loading so people can't click it many times
+    nextBtn.disabled = state === 'loading';
+  }
+
+  async function loadArtwork() {
+    showState('loading');
+
+    try {
+      // Pick a random page of 10 artworks, so each click shows something new
+      const page = Math.floor(Math.random() * 100) + 1;
+      const response = await fetch(`${API_URL}?page=${page}&limit=10&fields=${FIELDS}`);
+
+      // fetch() does not fail on errors like 404 or 500, so we check it ourselves
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Some artworks have no picture, so keep only the ones that have an image
+      const withImages = result.data.filter((art) => art.image_id);
+      if (withImages.length === 0) {
+        throw new Error('No artworks with images on this page');
+      }
+
+      // Choose one of them at random
+      const art = withImages[Math.floor(Math.random() * withImages.length)];
+
+      // The museum puts line breaks inside artist names, so turn them into commas
+      const artist = (art.artist_display || 'Unknown artist').replace(/\n/g, ', ');
+
+      // Build the image link using the museum's image server (IIIF)
+      const iiifUrl = result.config?.iiif_url || 'https://www.artic.edu/iiif/2';
+      imageEl.src = `${iiifUrl}/${art.image_id}/full/843,/0/default.jpg`;
+      imageEl.alt = `${art.title} by ${artist}`;
+
+      titleEl.textContent = art.title || 'Untitled';
+      artistEl.textContent = [artist, art.date_display].filter(Boolean).join(' · ');
+
+      showState('artwork');
+    } catch (error) {
+      // Log the technical details for developers, and show a friendly message to the user
+      console.error('Could not load artwork:', error);
+      showState('error');
+    }
+  }
+
+  // If the image itself fails to download, show the same friendly error
+  imageEl.addEventListener('error', () => {
+    if (imageEl.getAttribute('src')) showState('error');
+  });
+
+  nextBtn.addEventListener('click', loadArtwork);
+  retryBtn.addEventListener('click', loadArtwork);
+
+  // Load the first artwork when the page opens
+  loadArtwork();
 }
